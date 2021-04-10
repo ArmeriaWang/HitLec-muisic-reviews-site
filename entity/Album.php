@@ -6,31 +6,29 @@ final class Album
     private int $number;
     private string $name;
     private DateTime $releaseDate;
-    private string $company;
+//    private string $company;
 
     /**
      * Album constructor.
      * @param int $albumId
      * @param string $name
      * @param DateTime $releaseDate
-     * @param string $company
      * @throws Exception
      */
-    public function __construct(int $albumId, string $name, DateTime $releaseDate, string $company)
+    public function __construct(int $albumId, string $name, DateTime $releaseDate)
     {
-        if ($albumId <= 0) {
-            throw new UnexpectedValueException();
-        }
+//        if ($albumId <= 0) {
+//            throw new UnexpectedValueException();
+//        }
         $this->number = $albumId;
         $this->name = $name;
         $this->releaseDate = $releaseDate;
-        $this->company = $company;
     }
 
     /**
      * @return int
      */
-    public function getNumber(): int
+    public function getAlbumId(): int
     {
         return $this->number;
     }
@@ -49,14 +47,6 @@ final class Album
     public function getReleaseDate(): DateTime
     {
         return $this->releaseDate;
-    }
-
-    /**
-     * @return string
-     */
-    public function getCompany(): string
-    {
-        return $this->company;
     }
 
 }

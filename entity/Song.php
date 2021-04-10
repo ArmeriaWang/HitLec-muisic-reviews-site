@@ -54,7 +54,7 @@ final class Song
     /**
      * @return int
      */
-    public function getAlbumNumber(): int
+    public function getAlbumId(): int
     {
         return $this->albumNumber;
     }

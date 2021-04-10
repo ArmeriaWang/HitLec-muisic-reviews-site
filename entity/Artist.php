@@ -19,6 +19,9 @@ final class Artist
      */
     public function __construct(int $number, string $name, Datetime $birthDate, Sex $sex)
     {
+        if ($number < 0) {
+            throw new UnexpectedValueException();
+        }
         $this->number = $number;
         $this->name = $name;
         $this->birthDate = $birthDate;
