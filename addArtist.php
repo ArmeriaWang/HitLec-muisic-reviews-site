@@ -1,7 +1,7 @@
 <?php
 require_once "MysqlConn.php";
 require_once "entity/Artist.php";
-require_once "entity/enum/Sex.php";
+require_once "enum/Sex.php";
 
 function testInput($data): string
 {
@@ -26,7 +26,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $sex = testInput($_POST["sex"]);
     }
     if (strlen($name) != 0 && strlen($sex) != 0) {
-//        echo "artist :: " . $name . " " . $birthDate . " " . $sex . "\n";
+//        echo "artist :: " . $name . " " . $birthDate . " " . $sex . "<br>";
         $artist = new Artist(0, $name,
             DateTime::createFromFormat("Y-m-d", $birthDate), new Sex($sex));
         MysqlConn::getMysqlConnection()->addArtist($artist);
@@ -62,7 +62,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <option value="">Choose a sex</option>
             <?php
             require_once "utils.php";
-            require_once "entity/enum/Sex.php";
+            require_once "enum/Sex.php";
             echo array2multiChoice(Sex::toArray());
             ?>
         </select>

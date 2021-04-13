@@ -1,12 +1,13 @@
 <?php
 
 
+require_once "enum/Style.php";
 final class Song
 {
     private int $number;
     private string $name;
     private int $timeLength;
-    private int $albumNumber;
+    private int $albumId;
     private Style $style;
 
     /**
@@ -23,14 +24,14 @@ final class Song
         $this->number = $number;
         $this->name = $name;
         $this->timeLength = $timeLength;
-        $this->albumNumber = $albumNumber;
+        $this->albumId = $albumNumber;
         $this->style = $style;
     }
 
     /**
      * @return int
      */
-    public function getNumber(): int
+    public function getSongId(): int
     {
         return $this->number;
     }
@@ -56,7 +57,7 @@ final class Song
      */
     public function getAlbumId(): int
     {
-        return $this->albumNumber;
+        return $this->albumId;
     }
 
     /**

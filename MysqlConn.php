@@ -1,9 +1,15 @@
 <?php
 
 
+require_once "utils.php";
+require_once "entity/Song.php";
+require_once "entity/Artist.php";
+require_once "entity/Album.php";
+require_once "enum/Style.php";
+require_once "enum/Sex.php";
+
 final class MysqlConn
 {
-
     private string $servername = "127.0.0.1";
     private string $username = "root";
     private string $password = "123456";
@@ -17,7 +23,7 @@ final class MysqlConn
         if ($this->conn->connect_error) {
             die("connect failed: " . $this->conn->connect_error);
         }
-        echo "connection established!\n";
+        echo "connection established!<br>";
     }
 
     private function __clone()
@@ -87,6 +93,7 @@ final class MysqlConn
             "CREATE TABLE MakeAlbum (
         ArtistId INT NOT NULL,
         AlbumId INT NOT NULL,
+        ArtistName VARCHAR(256) NOT NULL,
         PRIMARY KEY (ArtistId, AlbumId),
         FOREIGN KEY (ArtistId) REFERENCES Artist(ArtistId),
         FOREIGN KEY (AlbumId) REFERENCES Album(AlbumId)
@@ -96,10 +103,19 @@ final class MysqlConn
             "CREATE TABLE MakeSong (
         ArtistId INT NOT NULL,
         SongId INT NOT NULL,
+        ArtistName VARCHAR(256) NOT NULL,
         PRIMARY KEY (ArtistId, SongId),
         FOREIGN KEY (ArtistId) REFERENCES Artist(ArtistId),
         FOREIGN KEY (SongId) REFERENCES Song(SongId)
     );");
+    }
+
+    private function getLatestId(string $tableName): int
+    {
+        $sql = "SELECT MAX(" . $tableName . "Id) FROM " . $tableName . ";";
+        echo $sql . "<br>";
+        $result = mysqli_query($this->conn, $sql);
+        return mysqli_fetch_array($result)[0];
     }
 
     public static function getMysqlConnection(): MysqlConn
@@ -117,77 +133,141 @@ final class MysqlConn
 
     private function transactionFailed()
     {
+        $errMsg = "Error occurs: " . mysqli_error($this->conn);
         ?>
-        <script>alert("Error occurs!"</script>
+        <script>alert(<?php echo '"' . $errMsg . '"'; ?>)</script>
         <?php
         $this->conn->rollback();
     }
 
-    public function addArtist(Artist $artist)
+    public function addArtist(Artist $artist): bool
     {
+        $this->conn->begin_transaction();
         $sql = "INSERT INTO Artist (Name, BirthDate, Sex) 
-            VALUES ('" . $artist->getName() .
-            "', '" . $artist->getBirthDate()->format("Y-m-d") .
-            "', '" . $artist->getSex() .
-            "');";
+            VALUES ('" . $artist->getName() . "', '"
+            . $artist->getBirthDate()->format("Y-m-d") . "', '"
+            . $artist->getSex()
+            . "');";
         echo $sql . "\n";
         if ($this->conn->query($sql)) {
             ?>
             <script>alert("Artist successfully added!")</script>
             <?php
         } else {
-            ?>
-            <script>alert("Error occurs!"</script>
-            <?php
+            $this->transactionFailed();
+            return false;
         }
+        return true;
     }
 
-    public function addAlbum(Album $album, array $artists)
+    public function addAlbum(Album $album, array $artistArr): bool
     {
         $this->conn->begin_transaction();
-        $sql = "INSERT INTO Album (Name, ReleaseDate) 
-            VALUES ('" . $album->getName() .
-            "', '" . $album->getReleaseDate()->format("Y-m-d") .
-            "');";
+        $sql = "INSERT INTO Album (Name, ReleaseDate) VALUES ('"
+            . $album->getName() . "', '"
+            . $album->getReleaseDate()->format("Y-m-d")
+            . "');";
+        echo $sql . "<br>";
+        if ($this->conn->query($sql) == 0) {
+            $this->transactionFailed();
+            return false;
+        }
+        $latestId = $this->getLatestId("Album");
+        echo "latestId = " . $latestId . "<br>";
+        foreach ($artistArr as $artistId) {
+            $artistName = mysqli_fetch_array(mysqli_query($this->conn,
+                "SELECT Name FROM Artist WHERE ArtistId = " . $artistId . ";"))[0];
+            $sql = "INSERT INTO MakeAlbum (ArtistId, AlbumId, ArtistName) VALUES ("
+                . $artistId . ", "
+                . $latestId . ", "
+                . $artistName
+                . ');';
+            echo $sql . "<br>";
+            if ($this->conn->query($sql) == 0) {
+                $this->transactionFailed();
+                return false;
+            }
+        }
+        $this->conn->commit();
+        ?>
+        <script>alert("Album successfully added!")</script>
+        <?php
+        return true;
+    }
+
+    public function addSong(Song $song, array $artistArr): bool
+    {
+        $this->conn->begin_transaction();
+        $sql = "INSERT INTO Song (Name, TimeLength, AlbumId, Style) VALUES ('"
+            . $song->getName() . "', '"
+            . $song->getTimeLength() . "', '"
+            . $song->getAlbumId() . "', '"
+            . $song->getStyle()
+            . "');";
+        echo $sql . "<br>";
+        if ($this->conn->query($sql) == 0) {
+            $this->transactionFailed();
+            return false;
+        }
+        $latestId = $this->getLatestId("Song");
+        echo "latestId = " . $latestId . "<br>";
+        foreach ($artistArr as $artistId) {
+            $artistName = mysqli_fetch_array(mysqli_query($this->conn,
+                "SELECT Name FROM Artist WHERE ArtistId = " . $artistId . ";"))[0];
+            $sql = "INSERT INTO MakeSong (ArtistId, SongId, ArtistName) VALUES ("
+                . $artistId . ", "
+                . $latestId . ", "
+                . $artistName
+                . ');';
+            echo $sql . "<br>";
+            if ($this->conn->query($sql) == 0) {
+                $this->transactionFailed();
+                return false;
+            }
+        }
+        $this->conn->commit();
+        ?>
+        <script>alert("Album successfully added!")</script>
+        <?php
+        return true;
+    }
+
+    public function addListener(Listener $listener): bool
+    {
+        $this->conn->begin_transaction();
+        $sql = "INSERT INTO Listener (Name) 
+            VALUES ('" . $listener->getName()
+            . "');";
         echo $sql . "\n";
-        if ($this->conn->query($sql) == 0) {
+        if ($this->conn->query($sql)) {
+            ?>
+            <script>alert("Listener successfully added!")</script>
+            <?php
+        } else {
             $this->transactionFailed();
-            return;
+            return false;
         }
-        foreach ($artists as $artistId) {
-            $sql = "INSERT INTO MakeAlbum (ArtistId, AlbumId) 
-                VALUES ('" . $artistId . "', " . $album->getAlbumId() . ');';
-            if ($this->conn->query($sql) == 0) {
-                $this->transactionFailed();
-                return;
-            }
-        }
-        $this->conn->commit();
+        return true;
     }
 
-    public function addSong(Song $song, array $artists)
+    public function getSongById(int $songId)
     {
-        $this->conn->begin_transaction();
-        $sql = "INSERT INTO Song (Name, AlbumId, Style, TimeLength) 
-            VALUES ('" . $song->getName() .
-            "', '" . $song->getAlbumId() .
-            "', '" . $song->getStyle() .
-            "', '" . $song->getTimeLength() .
-            "');";
-        if ($this->conn->query($sql) == 0) {
-            $this->transactionFailed();
-            return;
+        $result = mysqli_query($this->conn,
+            "SELECT * FROM SongsView WHERE SongId = " . $songId . ";");
+        if ($result == false) {
+            return false;
         }
-        foreach ($artists as $artistId) {
-            $sql = "INSERT INTO MakeSong (ArtistId, SongId) 
-                VALUES ('" . $artistId . "', " . $song->getAlbumId() .
-                ");";
-            if ($this->conn->query($sql) == 0) {
-                $this->transactionFailed();
-                return;
-            }
+        $songInfo = mysqli_fetch_array($result);
+        $song = new Song($songId, $songInfo["Name"], $songInfo["TimeLength"],
+            $songInfo["AlbumId"], new Style($songInfo["Style"]));
+        $albumName = $songInfo["AlbumName"];
+        $result = mysqli_query($this->conn,
+            "SELECT * FROM MakeSong WHERE SongId = " . $songId . ";");
+        $artistsNames = array();
+        while ($row = mysqli_fetch_array($result)) {
+            array_push($artistsNames, $row["ArtistName"]);
         }
-        $this->conn->commit();
+        return array($song, $albumName, $artistsNames);
     }
 
 }

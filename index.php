@@ -12,8 +12,10 @@
 <h1>MusRev</h1>
 <br>
 
-<a href="addArtist.php" id="newArtist">Add an artist</a>
+<h4><a href="addArtist.php" id="newArtist">Add an artist</a></h4>
 <br>
-<a href="addAlbum.php" id="newAlbum">Add an album</a>
+<h4><a href="addAlbum.php" id="newAlbum">Add an album</a></h4>
+<br>
+<h4><a href="addSong.php" id="newSong">Add a song</a></h4>
 </body>
 </html>

@@ -8,12 +8,12 @@ final class Listener
 
     /**
      * User constructor.
-     * @param int $id
+     * @param int $listenerId
      * @param string $name
      */
-    public function __construct(int $id, string $name)
+    public function __construct(int $listenerId, string $name)
     {
-        $this->id = $id;
+        $this->id = $listenerId;
         $this->name = $name;
     }
 
