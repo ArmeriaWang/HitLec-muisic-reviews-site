@@ -3,21 +3,21 @@
 
 final class Comment
 {
-    private int $id;
+    private int $commentId;
     private int $listenerId;
     private int $songId;
     private string $content;
 
     /**
      * SongComment constructor.
-     * @param int $id
+     * @param int $commentId
      * @param int $listenerId
      * @param int $songId
      * @param string $content
      */
-    public function __construct(int $id, int $listenerId, int $songId, string $content)
+    public function __construct(int $commentId, int $listenerId, int $songId, string $content)
     {
-        $this->id = $id;
+        $this->commentId = $commentId;
         $this->listenerId = $listenerId;
         $this->songId = $songId;
         $this->content = $content;
@@ -26,9 +26,9 @@ final class Comment
     /**
      * @return int
      */
-    public function getId(): int
+    public function getCommentId(): int
     {
-        return $this->id;
+        return $this->commentId;
     }
 
     /**
@@ -61,7 +61,7 @@ final class Comment
      */
     public function equals(Comment $comment): bool
     {
-        return $this->id == $comment->id;
+        return $this->commentId == $comment->commentId;
     }
 
 }

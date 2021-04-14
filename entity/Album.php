@@ -3,42 +3,45 @@
 
 final class Album
 {
-    private int $number;
-    private string $name;
+    private int $albumId;
+    private string $albumName;
     private DateTime $releaseDate;
-//    private string $company;
+    private ?array $artistsIds;
+    private ?array $songsIds;
 
     /**
      * Album constructor.
-     * @param int $albumId
-     * @param string $name
+     * @param int $number
+     * @param string $albumName
      * @param DateTime $releaseDate
-     * @throws Exception
+     * @param array|null $artistsIds
+     * @param array|null $songsIds
      */
-    public function __construct(int $albumId, string $name, DateTime $releaseDate)
+    public function __construct(int $number, string $albumName, DateTime $releaseDate,
+                                array $artistsIds = null, array $songsIds = null)
     {
-//        if ($albumId <= 0) {
-//            throw new UnexpectedValueException();
-//        }
-        $this->number = $albumId;
-        $this->name = $name;
+        $this->albumId = $number;
+        $this->albumName = $albumName;
         $this->releaseDate = $releaseDate;
+        $this->artistsIds = $artistsIds;
+        $this->songsIds = $songsIds;
     }
+
 
     /**
      * @return int
      */
     public function getAlbumId(): int
     {
-        return $this->number;
+        return $this->albumId;
     }
 
     /**
      * @return string
      */
-    public function getName(): string
+    public function getAlbumName(): string
     {
-        return $this->name;
+        return $this->albumName;
     }
 
     /**
@@ -47,6 +50,22 @@ final class Album
     public function getReleaseDate(): DateTime
     {
         return $this->releaseDate;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getArtistsIds(): ?array
+    {
+        return $this->artistsIds;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getSongsIds(): ?array
+    {
+        return $this->songsIds;
     }
 
 }

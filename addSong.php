@@ -3,13 +3,6 @@ require_once "MysqlConn.php";
 require_once "entity/Song.php";
 require_once "enum/Style.php";
 
-function testInput($data): string
-{
-    $data = trim($data);
-    $data = stripslashes($data);
-    return htmlspecialchars($data);
-}
-
 $nameErr = $albumIdErr = $styleErr = $lengthErr = $artistsErr = "";
 $name = $albumId = $style = $length = $artists = $artistArr = "";
 
@@ -46,8 +39,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     echo "song :: " . $name . " " . $albumId . " " . $style . " " . $length . " " . $artists . "<br>";
     if (strlen($name) && strlen($albumId) && strlen($style) && strlen($length) && strlen($artists)) {
         echo "song :: " . $name . " " . $albumId . " " . $style . " " . $length . " " . $artists . "<br>";
-        $song = new Song(0, $name, $length, $albumId, new Style($style));
-        MysqlConn::getMysqlConnection()->addSong($song, $artistArr);
+        $song = new Song(0, $name, $length, $albumId, new Style($style), $artistArr);
+        MysqlConn::getMysqlConnection()->addSong($song);
     }
 }
 

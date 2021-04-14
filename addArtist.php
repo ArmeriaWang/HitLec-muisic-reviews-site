@@ -2,13 +2,8 @@
 require_once "MysqlConn.php";
 require_once "entity/Artist.php";
 require_once "enum/Sex.php";
+require_once "utils.php";
 
-function testInput($data): string
-{
-    $data = trim($data);
-    $data = stripslashes($data);
-    return htmlspecialchars($data);
-}
 
 $nameErr = $sexErr = "";
 $name = $birthDate = $sex = "";

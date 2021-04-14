@@ -4,28 +4,32 @@
 require_once "enum/Style.php";
 final class Song
 {
-    private int $number;
-    private string $name;
+    private int $songId;
+    private string $songName;
     private int $timeLength;
     private int $albumId;
     private Style $style;
+    private array $artistsIds;
 
     /**
      * Song constructor.
-     * @param int $number
-     * @param string $name
+     * @param int $songId
+     * @param string $songName
      * @param int $timeLength
      * @param int $albumNumber
      * @param Style $style
+     * @param array|null $artistsIds
      */
 
-    public function __construct(int $number, string $name, int $timeLength, int $albumNumber, Style $style)
+    public function __construct(int $songId, string $songName, int $timeLength, int $albumNumber, Style $style,
+                                array $artistsIds = null)
     {
-        $this->number = $number;
-        $this->name = $name;
+        $this->songId = $songId;
+        $this->songName = $songName;
         $this->timeLength = $timeLength;
         $this->albumId = $albumNumber;
         $this->style = $style;
+        $this->artistsIds = $artistsIds;
     }
 
     /**
@@ -33,15 +37,15 @@ final class Song
      */
     public function getSongId(): int
     {
-        return $this->number;
+        return $this->songId;
     }
 
     /**
      * @return string
      */
-    public function getName(): string
+    public function getSongName(): string
     {
-        return $this->name;
+        return $this->songName;
     }
 
     /**
@@ -67,5 +71,14 @@ final class Song
     {
         return $this->style;
     }
+
+    /**
+     * @return array|null
+     */
+    public function getArtistsIds(): ?array
+    {
+        return $this->artistsIds;
+    }
+
 
 }

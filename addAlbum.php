@@ -1,13 +1,7 @@
 <?php
 require_once "MysqlConn.php";
 require_once "entity/Album.php";
-
-function testInput($data): string
-{
-    $data = trim($data);
-    $data = stripslashes($data);
-    return htmlspecialchars($data);
-}
+require_once "utils.php";
 
 $nameErr = $artistsErr = $releaseDateErr = $artistArr = "";
 $name = $artists = $releaseDate = "";

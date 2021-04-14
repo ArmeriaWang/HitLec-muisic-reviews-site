@@ -23,7 +23,7 @@ final class MysqlConn
         if ($this->conn->connect_error) {
             die("connect failed: " . $this->conn->connect_error);
         }
-        echo "connection established!<br>";
+//        echo "connection established!<br>";
     }
 
     private function __clone()
@@ -55,17 +55,17 @@ final class MysqlConn
         ArtistId INT AUTO_INCREMENT,
         Name VARCHAR(256) NOT NULL,
         BirthDate Date,
-        Sex ENUM" . array2string(Sex::toArray()) . " NOT NULL,
+        Sex ENUM" . array2string4insertion(Sex::toArray()) . " NOT NULL,
         PRIMARY KEY (ArtistId)
     );");
 
         $conn->query(
             "CREATE TABLE Song (
         SongId INT AUTO_INCREMENT,
-        Name VARCHAR(256) NOT NULL,
+        SongName VARCHAR(256) NOT NULL,
         TimeLength INT NOT NULL,
         AlbumId INT NOT NULL,
-        Style ENUM" . array2string(Style::toArray()) . ",
+        Style ENUM" . array2string4insertion(Style::toArray()) . ",
         PRIMARY KEY (SongId),
         FOREIGN KEY (AlbumId) REFERENCES Album(AlbumId)
     );");
@@ -80,7 +80,6 @@ final class MysqlConn
         $conn->query(
             "CREATE TABLE Comment (
         CommentId INT AUTO_INCREMENT,
-        Name VARCHAR(256) NOT NULL,
         ListenerId INT NOT NULL,
         AlbumId INT NOT NULL,
         Content VARCHAR(256) NOT NULL,
@@ -148,23 +147,21 @@ final class MysqlConn
             . $artist->getBirthDate()->format("Y-m-d") . "', '"
             . $artist->getSex()
             . "');";
-        echo $sql . "\n";
-        if ($this->conn->query($sql)) {
-            ?>
-            <script>alert("Artist successfully added!")</script>
-            <?php
-        } else {
+        echo $sql . "<br>";
+        if ($this->conn->query($sql) == false) {
             $this->transactionFailed();
             return false;
         }
+        $this->conn->commit();
+        echo '<script>alert("Artist successfully added!")</script>';
         return true;
     }
 
-    public function addAlbum(Album $album, array $artistArr): bool
+    public function addAlbum(Album $album): bool
     {
         $this->conn->begin_transaction();
         $sql = "INSERT INTO Album (Name, ReleaseDate) VALUES ('"
-            . $album->getName() . "', '"
+            . $album->getAlbumName() . "', '"
             . $album->getReleaseDate()->format("Y-m-d")
             . "');";
         echo $sql . "<br>";
@@ -174,51 +171,51 @@ final class MysqlConn
         }
         $latestId = $this->getLatestId("Album");
         echo "latestId = " . $latestId . "<br>";
+        $artistArr = $album->getArtistsIds();
         foreach ($artistArr as $artistId) {
             $artistName = mysqli_fetch_array(mysqli_query($this->conn,
                 "SELECT Name FROM Artist WHERE ArtistId = " . $artistId . ";"))[0];
             $sql = "INSERT INTO MakeAlbum (ArtistId, AlbumId, ArtistName) VALUES ("
                 . $artistId . ", "
-                . $latestId . ", "
-                . $artistName
-                . ');';
+                . $latestId . ", '"
+                . $artistName . "'"
+                . ");";
             echo $sql . "<br>";
-            if ($this->conn->query($sql) == 0) {
+            if ($this->conn->query($sql) == false) {
                 $this->transactionFailed();
                 return false;
             }
         }
         $this->conn->commit();
-        ?>
-        <script>alert("Album successfully added!")</script>
-        <?php
+        echo '<script>alert("Album successfully added!")</script>';
         return true;
     }
 
-    public function addSong(Song $song, array $artistArr): bool
+    public function addSong(Song $song): bool
     {
         $this->conn->begin_transaction();
-        $sql = "INSERT INTO Song (Name, TimeLength, AlbumId, Style) VALUES ('"
-            . $song->getName() . "', '"
+        $sql = "INSERT INTO Song (SongName, TimeLength, AlbumId, Style) VALUES ('"
+            . $song->getSongName() . "', '"
             . $song->getTimeLength() . "', '"
             . $song->getAlbumId() . "', '"
-            . $song->getStyle()
-            . "');";
+            . $song->getStyle() . "'"
+            . ");";
         echo $sql . "<br>";
-        if ($this->conn->query($sql) == 0) {
+        if ($this->conn->query($sql) == false) {
             $this->transactionFailed();
             return false;
         }
         $latestId = $this->getLatestId("Song");
         echo "latestId = " . $latestId . "<br>";
-        foreach ($artistArr as $artistId) {
+        $artistsArr = $song->getArtistsIds();
+        foreach ($artistsArr as $artistId) {
             $artistName = mysqli_fetch_array(mysqli_query($this->conn,
                 "SELECT Name FROM Artist WHERE ArtistId = " . $artistId . ";"))[0];
             $sql = "INSERT INTO MakeSong (ArtistId, SongId, ArtistName) VALUES ("
                 . $artistId . ", "
-                . $latestId . ", "
-                . $artistName
-                . ');';
+                . $latestId . ", '"
+                . $artistName . "'"
+                . ");";
             echo $sql . "<br>";
             if ($this->conn->query($sql) == 0) {
                 $this->transactionFailed();
@@ -238,18 +235,40 @@ final class MysqlConn
         $sql = "INSERT INTO Listener (Name) 
             VALUES ('" . $listener->getName()
             . "');";
-        echo $sql . "\n";
-        if ($this->conn->query($sql)) {
-            ?>
-            <script>alert("Listener successfully added!")</script>
-            <?php
-        } else {
+        echo $sql . "<br>";
+        if ($this->conn->query($sql) == false) {
             $this->transactionFailed();
             return false;
         }
+        $this->conn->commit();
+        $listenerId = $this->getLatestId("Listener");
+        $successAlert = "Listener (" . $listenerId . ", " . $listener->getName() . ") successfully added!";
+        echo '<script>alert("' . $successAlert . '")</script>';
         return true;
     }
 
+    public function addComment(Comment $comment): bool
+    {
+        $this->conn->begin_transaction();
+        $sql = "INSERT INTO Comment (ListenerId, SongId, Content) 
+            VALUES (" . $comment->getListenerId() . ", "
+            . $comment->getSongId() . ", '"
+            . $comment->getContent() . "'"
+            . ");";
+        echo $sql . "<br>";
+        if ($this->conn->query($sql) == false) {
+            $this->transactionFailed();
+            return false;
+        }
+        $this->conn->commit();
+        echo '<script>alert("Comment successfully added!")</script>';
+        return true;
+    }
+
+    /**
+     * @param int $songId
+     * @return array|false array[0] is a instance of Song, array[1] is its album name
+     */
     public function getSongById(int $songId)
     {
         $result = mysqli_query($this->conn,
@@ -258,16 +277,45 @@ final class MysqlConn
             return false;
         }
         $songInfo = mysqli_fetch_array($result);
-        $song = new Song($songId, $songInfo["Name"], $songInfo["TimeLength"],
-            $songInfo["AlbumId"], new Style($songInfo["Style"]));
-        $albumName = $songInfo["AlbumName"];
+
         $result = mysqli_query($this->conn,
             "SELECT * FROM MakeSong WHERE SongId = " . $songId . ";");
         $artistsNames = array();
+        $artistsIds = array();
         while ($row = mysqli_fetch_array($result)) {
             array_push($artistsNames, $row["ArtistName"]);
+            array_push($artistsIds, $row["ArtistId"]);
         }
+        $albumName = $songInfo["AlbumName"];
+        $song = new Song($songId, $songInfo["SongName"], $songInfo["TimeLength"],
+            $songInfo["AlbumId"], new Style($songInfo["Style"]), $artistsIds);
         return array($song, $albumName, $artistsNames);
+    }
+
+    public function getListenerById(int $listenerId)
+    {
+        $result = mysqli_query($this->conn,
+            "SELECT * FROM Listener WHERE ListenerId = " . $listenerId . ";");
+        if ($result == false) {
+            return false;
+        }
+        $listenerInfo = mysqli_fetch_array($result);
+        return new Listener($listenerId, $listenerInfo["Name"]);
+    }
+
+    public function getCommentsBySongId(int $songId)
+    {
+        $result = mysqli_query($this->conn,
+            "SELECT * FROM Comment WHERE SongId = " . $songId . ";");
+        if ($result == false) {
+            return false;
+        }
+        $comments = array();
+        while ($row = mysqli_fetch_array($result)) {
+            array_push($comments,
+                new Comment($row["CommentId"], $row["ListenerId"], $row["SongId"], $row["Content"]));
+        }
+        return $comments;
     }
 
 }
