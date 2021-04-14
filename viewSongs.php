@@ -35,7 +35,7 @@ $sql = "SELECT * FROM SongsView;";
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($_POST["name"]) {
         $name = $_POST["name"];
-        $sql = "SELECT * FROM Song WHERE SongName like '%" . $name . "%';";
+        $sql = "SELECT * FROM SongsView WHERE SongName like '%" . $name . "%';";
     }
 }
 $result = mysqli_query($conn, $sql);
