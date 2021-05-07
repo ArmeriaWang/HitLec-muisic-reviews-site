@@ -1,7 +1,7 @@
 <?php
-require_once "MysqlConn.php";
-require_once "entity/Song.php";
-require_once "enum/Style.php";
+require_once "../MysqlConn.php";
+require_once "../entity/Song.php";
+require_once "../enum/Style.php";
 
 $nameErr = $albumIdErr = $styleErr = $lengthErr = $artistsErr = "";
 $name = $albumId = $style = $length = $artists = $artistArr = "";
@@ -53,6 +53,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
 
+<h4><a href="../../index.php">Home Page</a></h4>
+<h4><a href="viewSongs.php">Back to songs view</a></h4>
+
 <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
     <h2> Song information Entry </h2>
     <br>
@@ -61,38 +64,38 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <input type="text" name="name">
         <span class="error">* <?php echo $nameErr; ?></span>
     </label>
-    <br>
+    <br><br>
     Style:
     <label>
         <select name="style">
             <option value="">Choose a style</option>
             <?php
-            require_once "utils.php";
-            require_once "enum/Style.php";
+            require_once "../utils.php";
+            require_once "../enum/Style.php";
             echo array2multiChoice(Style::toArray());
             ?>
         </select>
         <span class="error">* <?php echo $styleErr; ?></span>
     </label>
-    <br>
+    <br><br>
     AlbumId:
     <label>
         <input type="text" name="albumId">
         <span class="error">* <?php echo $albumIdErr; ?></span>
     </label>
-    <br>
+    <br><br>
     TimeLength:
     <label>
         <input type="text" name="length">
         <span class="error">* <?php echo $lengthErr; ?></span>
     </label>
-    <br>
+    <br><br>
     Artist (if multiple, separated by a single comma):
     <label>
         <input type="text" name="artists">
         <span class="error">* <?php echo $artistsErr; ?></span>
     </label>
-    <br>
+    <br><br>
     <input type="submit" value="submit">
 </form>
 

@@ -1,8 +1,8 @@
 <?php
-require_once "MysqlConn.php";
-require_once "entity/Listener.php";
-require_once "enum/Sex.php";
-require_once "utils.php";
+require_once "../MysqlConn.php";
+require_once "../entity/Listener.php";
+require_once "../enum/Sex.php";
+require_once "../utils.php";
 
 
 $nameErr = "";
@@ -29,6 +29,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <title>MusRev - Add Listener</title>
 </head>
 
+<h4><a href="../../index.php">Home Page</a></h4>
+
 <body>
 <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
     <h2> Listener information Entry </h2>
@@ -38,7 +40,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <input type="text" name="name">
         <span class="error">* <?php echo $nameErr; ?></span>
     </label>
-    <br>
+    <br><br>
     <input type="submit" value="submit">
 </form>
 

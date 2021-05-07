@@ -6,25 +6,25 @@ final class Album
     private int $albumId;
     private string $albumName;
     private DateTime $releaseDate;
-    private ?array $artistsIds;
-    private ?array $songsIds;
+    private ?array $songs;
+    private ?array $artists;
 
     /**
      * Album constructor.
      * @param int $number
      * @param string $albumName
      * @param DateTime $releaseDate
-     * @param array|null $artistsIds
-     * @param array|null $songsIds
+     * @param array|null $artists
+     * @param array|null $songs
      */
     public function __construct(int $number, string $albumName, DateTime $releaseDate,
-                                array $artistsIds = null, array $songsIds = null)
+                                array $artists = null, array $songs = null)
     {
         $this->albumId = $number;
         $this->albumName = $albumName;
         $this->releaseDate = $releaseDate;
-        $this->artistsIds = $artistsIds;
-        $this->songsIds = $songsIds;
+        $this->artists = $artists;
+        $this->songs = $songs;
     }
 
 
@@ -55,17 +55,17 @@ final class Album
     /**
      * @return array|null
      */
-    public function getArtistsIds(): ?array
+    public function getArtists(): ?array
     {
-        return $this->artistsIds;
+        return $this->artists;
     }
 
     /**
      * @return array|null
      */
-    public function getSongsIds(): ?array
+    public function getSongs(): ?array
     {
-        return $this->songsIds;
+        return $this->songs;
     }
 
 }

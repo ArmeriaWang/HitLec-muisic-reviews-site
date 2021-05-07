@@ -1,6 +1,6 @@
 <?php
 
-require_once "vendor/autoload.php";
+require_once "../../vendor/autoload.php";
 use MyCLabs\Enum\Enum;
 final class Sex extends Enum
 {

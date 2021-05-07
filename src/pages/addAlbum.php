@@ -1,9 +1,9 @@
 <?php
-require_once "MysqlConn.php";
-require_once "entity/Album.php";
-require_once "utils.php";
+require_once "../MysqlConn.php";
+require_once "../entity/Album.php";
+require_once "../utils.php";
 
-$nameErr = $artistsErr = $releaseDateErr = $artistArr = "";
+$nameErr = $artistsErr = $releaseDateErr = $artistsIds = "";
 $name = $artists = $releaseDate = "";
 
 //$addingSongs = false;
@@ -17,11 +17,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (empty($_POST["artists"])) {
         $artistsErr = "This Segment must be filled!";
     } else {
-        $artists = $_POST["artists"];
-        echo "artists = " . $artists . "<br>";
-        $artistArr = explode(",", testInput($artists));
-        foreach ($artistArr as $k => $v) {
-            $artistArr[$k] = trim($v);
+        $artistsIds = $_POST["artists"];
+        $artistsIdArr = explode(",", testInput($artistsIds));
+        $artists = array();
+        foreach ($artistsIdArr as $v) {
+            array_push($artists, new Artist(trim($v)));
         }
     }
     if (empty($_POST["releaseDate"])) {
@@ -30,11 +30,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $releaseDate = testInput($_POST["releaseDate"]);
     }
     echo "album :: " . $name . " " . $releaseDate . "<br>";
-    if (strlen($name) && strlen($artists) && strlen($releaseDate)) {
+    if (strlen($name) && strlen($artistsIds) && strlen($releaseDate)) {
         echo "album :: " . $name . " " . $releaseDate . "<br>";
         $album = new Album(0, $name,
-            DateTime::createFromFormat("Y-m-d", $releaseDate));
-        MysqlConn::getMysqlConnection()->addAlbum($album, $artistArr);
+            DateTime::createFromFormat("Y-m-d", $releaseDate),
+            $artists, null);
+        MysqlConn::getMysqlConnection()->addAlbum($album);
+        header("Location: viewAlbums.php");
+        exit;
     }
 
 }
@@ -44,44 +47,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="">
 <head>
     <title>MisRev - Add Album</title>
-<!--    <script>
-        function getAlbumInfo() {
-            let xmlHttp = new XMLHttpRequest();
-            let info = document.getElementById("albumInfo");
-            info.getAttribute("name");
-            xmlHttp.onreadystatechange = function () {
-                if (xmlHttp.readyState === 4 && xmlHttp.status === 200) {
-                    document.getElementById("albumInfo").innerHTML = xmlHttp.responseText;
-                }
-            }
-            xmlHttp.open("GET", "getLatest.php?");
-        }
-    </script>-->
 </head>
+
+<h4><a href="../../index.php">Home Page</a></h4>
+<h4><a href="viewAlbums.php">Back to albums view</a></h4>
 
 <body>
 <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
     <h3>Album information Entry</h3>
     <br>
     <div id="albumInfo">
-        Name:
+        Name
         <label>
             <input type="text" name="name">
             <span class="error">* <?php echo $nameErr; ?></span>
         </label>
-        <br>
-        Release Date:
+        <br><br>
+        Release Date
         <label>
             <input type="date" name="releaseDate">
             <span class="error">* <?php echo $releaseDateErr; ?></span>
         </label>
-        <br>
-        Artist (if multiple, separated by a single comma):
+        <br><br>
+        ArtistId
         <label>
             <input type="text" name="artists">
-            <span class="error">* <?php echo $artistsErr; ?></span>
+            *(if multiple, separated by a single comma)<br>
+            <span class="error"> <?php echo $artistsErr; ?></span>
         </label>
-        <br>
+        <br><br>
         <input type="submit" value="submit">
         <br>
 

@@ -1,8 +1,8 @@
 <?php
-require_once "MysqlConn.php";
-require_once "entity/Artist.php";
-require_once "enum/Sex.php";
-require_once "utils.php";
+require_once "../MysqlConn.php";
+require_once "../entity/Artist.php";
+require_once "../enum/Sex.php";
+require_once "../utils.php";
 
 
 $nameErr = $sexErr = "";
@@ -25,6 +25,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $artist = new Artist(0, $name,
             DateTime::createFromFormat("Y-m-d", $birthDate), new Sex($sex));
         MysqlConn::getMysqlConnection()->addArtist($artist);
+        header("Location: viewArtists.php");
+        exit;
     }
 }
 
@@ -37,6 +39,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
 
+<h4><a href="../../index.php">Home Page</a></h4>
+<h4><a href="viewArtists.php">Back to artists view</a></h4>
+
 <form method="post" action="<?php echo htmlspecialchars($_SERVER['PHP_SELF']); ?>">
     <h2> Artist information Entry </h2>
     <br>
@@ -45,25 +50,25 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <input type="text" name="name">
         <span class="error">* <?php echo $nameErr; ?></span>
     </label>
-    <br>
+    <br><br>
     BirthDate:
     <label>
         <input type="date" name="birthDate">
     </label>
-    <br>
+    <br><br>
     Sex:
     <label>
         <select name="sex">
             <option value="">Choose a sex</option>
             <?php
-            require_once "utils.php";
-            require_once "enum/Sex.php";
+            require_once "../utils.php";
+            require_once "../enum/Sex.php";
             echo array2multiChoice(Sex::toArray());
             ?>
         </select>
         <span class="error">* <?php echo $nameErr; ?></span>
     </label>
-    <br>
+    <br><br>
     <input type="submit" value="submit">
 </form>
 

@@ -1,7 +1,7 @@
 <?php
 
 
-require_once "enum/Style.php";
+require_once "../enum/Style.php";
 final class Song
 {
     private int $songId;
@@ -9,7 +9,7 @@ final class Song
     private int $timeLength;
     private int $albumId;
     private Style $style;
-    private array $artistsIds;
+    private ?array $artists;
 
     /**
      * Song constructor.
@@ -18,18 +18,18 @@ final class Song
      * @param int $timeLength
      * @param int $albumNumber
      * @param Style $style
-     * @param array|null $artistsIds
+     * @param array|null $artists
      */
 
     public function __construct(int $songId, string $songName, int $timeLength, int $albumNumber, Style $style,
-                                array $artistsIds = null)
+                                array $artists = null)
     {
         $this->songId = $songId;
         $this->songName = $songName;
         $this->timeLength = $timeLength;
         $this->albumId = $albumNumber;
         $this->style = $style;
-        $this->artistsIds = $artistsIds;
+        $this->artists = $artists;
     }
 
     /**
@@ -75,9 +75,9 @@ final class Song
     /**
      * @return array|null
      */
-    public function getArtistsIds(): ?array
+    public function getArtists(): ?array
     {
-        return $this->artistsIds;
+        return $this->artists;
     }
 
 
